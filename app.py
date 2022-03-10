@@ -25,16 +25,28 @@ nlp = spacy.load('en')
 # The route() function of the Flask class is a decorator, 
 # which tells the application which URL should call 
 # the associated function.
-@app.route('/classifyContext',methods=['POST'])
+
+
 def classify_context(question, intent):
+    print (question)
+    print (intent)
     if intent == 'Delivery':
         model_directory = 'models/base_context/'
-        interpreter = Interpreter.load(model_directory) 
-        context = interpreter.parse(question)['intent']['name']
+        interpreter = Interpreter.load(model_directory)
+        context = interpreter.parse(question)
+        print (context)
         return context
 
 
-@app.route('/classifyIntent',methods = ['POST'])
+
+@app.route('/classifyContext',methods=['POST'])
+def classifyContext():
+    response = {}
+    data = request.json
+    question = data.get('question','')
+    intent = data.get('intent','delivery')
+    response = classify_context(question,intent)
+    return response
 # ‘/’ URL is bound with hello_world() function.
 def classifyIntent():
     '''
@@ -56,4 +68,4 @@ if __name__ == '__main__':
   
     # run() method of Flask class runs the application 
     # on the local development server.
-    app.run()
+    app.run(debug=True)
