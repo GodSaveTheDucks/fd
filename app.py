@@ -3,7 +3,8 @@ from rasa_nlu.training_data import load_data
 from rasa_nlu.config import RasaNLUModelConfig
 from rasa_nlu.model import Trainer
 from rasa_nlu import config
-from rasa_nlu.model import Metadata, Interpreter
+from rasa_nlu.model import Trainer, Metadata, Interpreter
+from simpletransformers.question_answering import QuestionAnsweringModel
 
 import rasa_nlu
 import spacy
@@ -19,10 +20,19 @@ def trainModel(data, model_name):
 
 app = Flask(__name__)
 aug_interpreter, aug_mod_dir = trainModel('models/intent.json','augmented')
+nlp = spacy.load('en')
   
 # The route() function of the Flask class is a decorator, 
 # which tells the application which URL should call 
 # the associated function.
+@app.route('/classifyContext',methods=['POST'])
+def classify_context(question, intent):
+    if intent == 'Delivery':
+        model_directory = 'models/base_context/'
+        interpreter = Interpreter.load(model_directory) 
+        context = interpreter.parse(question)['intent']['name']
+        return context
+
 
 @app.route('/classifyIntent',methods = ['POST'])
 # ‘/’ URL is bound with hello_world() function.
