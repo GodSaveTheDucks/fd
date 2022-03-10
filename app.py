@@ -31,6 +31,7 @@ def classify_context(question, intent):
     print (question)
     print (intent)
     if intent == 'Delivery':
+        print ("control here")
         model_directory = 'models/base_context/'
         interpreter = Interpreter.load(model_directory)
         context = interpreter.parse(question)
@@ -44,7 +45,7 @@ def classifyContext():
     response = {}
     data = request.json
     question = data.get('question','')
-    intent = data.get('intent','delivery')
+    intent = data.get('intent','Delivery')
     response = classify_context(question,intent)
     return response
 # ‘/’ URL is bound with hello_world() function.
