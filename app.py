@@ -39,13 +39,14 @@ def classify_context(question, intent):
 
 def qa_model(intent,context,question):
     if intent == 'Delivery':
-    bert_model_directory = 'outputs/delivery/bert/best_model/'
-    model = QuestionAnsweringModel('bert', bert_model_directory, use_cuda=False)
+        bert_model_directory = 'outputs/delivery/bert/best_model/'
+        model = QuestionAnsweringModel('bert', bert_model_directory, use_cuda=False)
 
-    to_predict = [{ "context": context, "qas": [{ "question": question, "id": 150 }] }]
-    answers, probabilities = model.predict(to_predict)
-    return str(answers[0]['answer'][0])
-
+        to_predict = [{ "context": context, "qas": [{ "question": question, "id": 150 }] }]
+        answers, probabilities = model.predict(to_predict)
+        return str(answers[0]['answer'][0])
+    return ""
+    
 @app.route('/classifyContext',methods=['POST'])
 def classifyContext():
     response = {}
