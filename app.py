@@ -31,15 +31,20 @@ def classify_context(question, intent):
     print (question)
     print (intent)
     if intent == 'Delivery':
-        print ("control here")
         model_directory = 'models/base_context/'
         interpreter = Interpreter.load(model_directory)
-        print (interpreter)
         context = interpreter.parse(question)
-        print (context)
         return context
 
 
+def qa_model(intent,context,question):
+    if intent == 'Delivery':
+    bert_model_directory = 'outputs/delivery/bert/best_model/'
+    model = QuestionAnsweringModel('bert', bert_model_directory, use_cuda=False)
+
+    to_predict = [{ "context": context, "qas": [{ "question": question, "id": 150 }] }]
+    answers, probabilities = model.predict(to_predict)
+    return str(answers[0]['answer'][0])
 
 @app.route('/classifyContext',methods=['POST'])
 def classifyContext():
@@ -47,8 +52,16 @@ def classifyContext():
     data = request.json
     question = data.get('question','')
     intent = data.get('intent','Delivery')
-    response = classify_context(question,intent)
-    return response
+    context = classify_context(question,intent)
+    context = context['intent']['name']
+    answer = qa_model('Delivery', context, question)
+    return {
+        "question" : question, 
+        "context" : context, 
+        "answer" : answer
+    }
+
+@app.route('/
 # ‘/’ URL is bound with hello_world() function.
 def classifyIntent():
     '''
