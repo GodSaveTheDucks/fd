@@ -34,6 +34,7 @@ def classify_context(question, intent):
         print ("control here")
         model_directory = 'models/base_context/'
         interpreter = Interpreter.load(model_directory)
+        print (interpreter)
         context = interpreter.parse(question)
         print (context)
         return context
