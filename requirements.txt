@@ -1,5 +1,5 @@
 flask
 nlpaug
-transformers
 simpletransformers
 spacy==2.2.4
+torch
