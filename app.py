@@ -44,9 +44,7 @@ def qa_model(intent,context,question):
 
         to_predict = [{ "context": context, "qas": [{ "question": question, "id": 150 }] }]
         answers, probabilities = model.predict(to_predict)
-        if isinstance(probabilities,list):
-            probabilities = probabilities[0]
-        return str(answers[0]['answer'][0]),probabilities
+        return str(answers[0]['answer'][0]),probabilities['probability'][0]
         #return {}
     return ""
     
