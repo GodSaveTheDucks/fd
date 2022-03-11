@@ -106,6 +106,8 @@ def classifyContext():
         return {
             "question": question,
             "answer": answer,
+            "context": "",
+            "confidence" : 100.0,
             "otherquestions" : []
         }
     context = classify_context(question,intent)
@@ -118,6 +120,7 @@ def classifyContext():
     return {
         "question" : question, 
         "answer" : answer,
+        "context" : context,
         "other_question" : otherquestions,
         "confidence" : confidence}
   
