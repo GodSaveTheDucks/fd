@@ -44,7 +44,7 @@ def qa_model(intent,context,question):
 
         to_predict = [{ "context": context, "qas": [{ "question": question, "id": 150 }] }]
         answers, probabilities = model.predict(to_predict)
-        return str(answers[0]['answer'][0]),probabilities['probability'][0]
+        return str(answers[0]['answer'][0]),probabilities[0]['probability'][0]
         #return {}
     return ""
     
@@ -60,7 +60,7 @@ def classifyContext():
     contextObj = context['intent']
     context = context['intent']['name']
     answer,confidence = qa_model('Delivery', context, question)
-    if int(confidence) < 50:
+    if confidence < 0.2:
         otherquestions = get_similar_questions(question, contextObj)
         return {
             "question" : question, 
