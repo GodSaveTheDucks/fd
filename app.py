@@ -16,7 +16,7 @@ app = Flask(__name__)
 nlp = spacy.load('en')
 bert_model_directory = 'outputs/delivery/bert/best_model/'
 model = QuestionAnsweringModel('bert', bert_model_directory, use_cuda=False)
-df = pd.read_excel('data/Delivery_Contexts4.xlsx', sheet_name='Data v3.2', nrows= 106, usecols=[0,1,2])
+df = pd.read_excel('data/All_Intents.xlsx')
 
 def classify_context(question, intent):
     if intent == 'Delivery':
@@ -45,15 +45,15 @@ def classify_context(question, intent):
         context = interpreter.parse(question)
         return context
 
-def get_similar_questions(question, context):
+def get_similar_questions(question, context,intent):
+    df1 = df[df.Intents == intent]
     context = context.get('name','')
-    df1 = df[df.Context == context]
+    df1 = df1[df1.Contexts == context]
     question_list = df1.Question.to_list()
     q1_doc = nlp(question)
     question_doc = [nlp(que) for que in question_list]
     similar_ques = [q1_doc.similarity(doc) for doc in question_doc]
     similar_ques_df = pd.DataFrame(similar_ques, columns=['sim_val'])
-    print (similar_ques_df)
     top_questions = similar_ques_df.sort_values('sim_val', ascending=False)[:5]
     return [question_list[i] for i in top_questions.index]
 
@@ -104,7 +104,7 @@ def classifyContext():
     context = context['intent']['name']
     answer,confidence = qa_model('Delivery', context, question)
     if confidence < 0.5:
-        otherquestions = get_similar_questions(question, contextObj)
+        otherquestions = get_similar_questions(question, contextObj,intent)
         
     return {
         "question" : question, 
