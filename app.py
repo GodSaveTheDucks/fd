@@ -17,7 +17,7 @@ nlp = spacy.load('en')
 bert_model_directory = 'outputs/delivery/bert/best_model/'
 model = QuestionAnsweringModel('bert', bert_model_directory, use_cuda=False)
 df = pd.read_excel('data/Delivery_Contexts4.xlsx', sheet_name='Data v3.2', nrows= 106, usecols=[0,1,2])
-
+print (df)
 
 def classify_context(question, intent):
     if intent == 'Delivery':
@@ -28,6 +28,7 @@ def classify_context(question, intent):
 
 def get_similar_questions(question, context):
     df1 = df[df.Context == context]
+    print (df)
     question_list = df1.Question.to_list()
     print (question_list)
     q1_doc = nlp(question)
