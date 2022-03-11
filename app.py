@@ -62,15 +62,13 @@ def classifyContext():
     answer,confidence = qa_model('Delivery', context, question)
     if confidence < 0.4:
         otherquestions = get_similar_questions(question, contextObj)
-        return {
-            "question" : question, 
-            "context" : context,
-            "answer" : otherquestions}
     return {
         "question" : question, 
         "context" : context,
-        "answer" : answer}
-    
+        "answer" : answer,
+        "other_question" : otherquestions,
+        "confidence" : confidence}
+  
     
 # main driver function
 if __name__ == '__main__':
