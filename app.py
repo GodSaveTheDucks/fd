@@ -29,10 +29,12 @@ def classify_context(question, intent):
 def get_similar_questions(question, context):
     df1 = df[df.Context == context]
     question_list = df1.Question.to_list()
+    print (question_list)
     q1_doc = nlp(question)
     question_doc = [nlp(que) for que in question_list]
     similar_ques = [q1_doc.similarity(doc) for doc in question_doc]
     similar_ques_df = pd.DataFrame(similar_ques, columns=['sim_val'])
+    print (similar_ques_df)
     top_questions = similar_ques_df.sort_values('sim_val', ascending=False)[:5]
     return [question_list[i] for i in top_questions.index]
 
@@ -61,7 +63,9 @@ def classifyContext():
     context = context['intent']['name']
     answer,confidence = qa_model('Delivery', context, question)
     if confidence < 0.5:
+        print ("Here")
         otherquestions = get_similar_questions(question, contextObj)
+        
     return {
         "question" : question, 
         "context" : context,
