@@ -49,7 +49,7 @@ def get_similar_questions(question, context,intent):
     df1 = df[df.Intents == intent]
     context = context.get('name','')
     df1 = df1[df1.Contexts == context]
-    question_list = df1.Question.to_list()
+    question_list = df1.Questions.to_list()
     q1_doc = nlp(question)
     question_doc = [nlp(que) for que in question_list]
     similar_ques = [q1_doc.similarity(doc) for doc in question_doc]
