@@ -26,7 +26,8 @@ def classify_context(question, intent):
         return context
 
 def get_similar_questions(question, context):
-    df1 = df[df.Context in context.get('name','')]
+    context = context.get('name','')
+    df1 = df[df.Context == context]
     question_list = df1.Question.to_list()
     q1_doc = nlp(question)
     question_doc = [nlp(que) for que in question_list]
