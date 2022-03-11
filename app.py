@@ -61,9 +61,8 @@ def classifyContext():
     contextObj = context['intent']
     context = context['intent']['name']
     answer,confidence = qa_model('Delivery', context, question)
-    # if confidence < 0.5:
-    #     print ("Here")
-    otherquestions = get_similar_questions(question, contextObj)
+    if confidence < 0.5:
+        otherquestions = get_similar_questions(question, contextObj)
         
     return {
         "question" : question, 
