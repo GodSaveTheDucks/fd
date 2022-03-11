@@ -99,6 +99,15 @@ def classifyContext():
     data = request.json
     question = data.get('question','')
     intent = data.get('intent','Delivery')
+    flag = data.get('flag',False)
+    if flag and question in df.Questions.to_list():
+        index = df.Questions.to_list().index(question)
+        answer = df.Answers.to_list()[index]
+        return {
+            "question": question,
+            "answer": answer,
+            "otherquestions" : []
+        }
     context = classify_context(question,intent)
     contextObj = context['intent']
     context = context['intent']['name']
@@ -108,7 +117,6 @@ def classifyContext():
         
     return {
         "question" : question, 
-        "context" : context,
         "answer" : answer,
         "other_question" : otherquestions,
         "confidence" : confidence}
