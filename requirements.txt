@@ -3,3 +3,5 @@ nlpaug
 simpletransformers
 spacy==2.2.4
 torch
+openpyxl
+pandas
