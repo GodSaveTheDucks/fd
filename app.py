@@ -21,7 +21,9 @@ def trainModel(data, model_name):
 app = Flask(__name__)
 aug_interpreter, aug_mod_dir = trainModel('models/intent.json','augmented')
 nlp = spacy.load('en')
-  
+bert_model_directory = 'outputs/delivery/bert/best_model/'
+model = QuestionAnsweringModel('bert', bert_model_directory, use_cuda=False)
+ 
 # The route() function of the Flask class is a decorator, 
 # which tells the application which URL should call 
 # the associated function.
@@ -45,6 +47,7 @@ def qa_model(intent,context,question):
         to_predict = [{ "context": context, "qas": [{ "question": question, "id": 150 }] }]
         answers, probabilities = model.predict(to_predict)
         return str(answers[0]['answer'][0])
+        #return {}
     return ""
     
 @app.route('/classifyContext',methods=['POST'])
@@ -56,11 +59,11 @@ def classifyContext():
     context = classify_context(question,intent)
     context = context['intent']['name']
     answer = qa_model('Delivery', context, question)
+    
     return {
         "question" : question, 
         "context" : context, 
-        "answer" : answer
-    }
+        "answer" : answer}
 
 @app.route('/classifyIntent',methods=['POST'])
 # ‘/’ URL is bound with hello_world() function.

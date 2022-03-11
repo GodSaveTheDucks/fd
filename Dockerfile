@@ -10,7 +10,7 @@ RUN /bin/bash -c 'python3 -m spacy download en_core_web_md'
 RUN /bin/bash -c 'python3 -m spacy link en_core_web_md en --force;'
 RUN /bin/bash -c 'python3 -m pip install rasa_nlu==0.14'
 RUN /bin/bash -c 'python3 -m pip install scikit-learn==0.22.2.post1'
-
+RUN /bin/bash -c 'python3 -m pip install simpletransformers'
 COPY . .
 
 CMD [ "flask", "run", "--host=0.0.0.0"]
