@@ -9,34 +9,32 @@ from simpletransformers.question_answering import QuestionAnsweringModel
 import rasa_nlu
 import spacy
 import numpy as np
+import pandas as pd
 
-def trainModel(data, model_name):
-    training_data = load_data(data)
-    trainer = Trainer(config.load("config.yml"))
-    trainer.train(training_data)
-    model_directory = trainer.persist('./models/nlu/', fixed_model_name=model_name)
-    interpreter = Interpreter.load(model_directory)
-    return interpreter, model_directory
 
 app = Flask(__name__)
-aug_interpreter, aug_mod_dir = trainModel('models/intent.json','augmented')
 nlp = spacy.load('en')
 bert_model_directory = 'outputs/delivery/bert/best_model/'
 model = QuestionAnsweringModel('bert', bert_model_directory, use_cuda=False)
- 
-# The route() function of the Flask class is a decorator, 
-# which tells the application which URL should call 
-# the associated function.
+df = pd.read_excel('data/Delivery_Contexts4.xlsx', sheet_name='Data v3.2', nrows= 106, usecols=[0,1,2])
 
 
 def classify_context(question, intent):
-    print (question)
-    print (intent)
     if intent == 'Delivery':
         model_directory = 'models/base_context/'
         interpreter = Interpreter.load(model_directory)
         context = interpreter.parse(question)
         return context
+
+def get_similar_questions(question, context):
+    df1 = df[df.Context == context]
+    question_list = df1.Question.to_list()
+    q1_doc = nlp(question)
+    question_doc = [nlp(que) for que in question_list]
+    similar_ques = [q1_doc.similarity(doc) for doc in question_doc]
+    similar_ques_df = pd.DataFrame(similar_ques, columns=['sim_val'])
+    top_questions = similar_ques_df.sort_values('sim_val', ascending=False)[:5]
+    return [question_list[i] for i in top_questions.index]
 
 
 def qa_model(intent,context,question):
@@ -46,42 +44,36 @@ def qa_model(intent,context,question):
 
         to_predict = [{ "context": context, "qas": [{ "question": question, "id": 150 }] }]
         answers, probabilities = model.predict(to_predict)
-        return str(answers[0]['answer'][0])
+        if isinstance(probabilities,list):
+            probabilities = probabilities[0]
+        return str(answers[0]['answer'][0]),probabilities
         #return {}
     return ""
     
 @app.route('/classifyContext',methods=['POST'])
 def classifyContext():
-    response = {}
+    answer = None
+    otherquestions = []
+    confidence = None
     data = request.json
     question = data.get('question','')
     intent = data.get('intent','Delivery')
     context = classify_context(question,intent)
+    contextObj = context['intent']
     context = context['intent']['name']
-    answer = qa_model('Delivery', context, question)
-    
+    answer,confidence = qa_model('Delivery', context, question)
+    if int(confidence) < 50:
+        otherquestions = get_similar_questions(question, contextObj)
+        return {
+            "question" : question, 
+            "context" : context,
+            "answer" : otherquestions}
     return {
         "question" : question, 
-        "context" : context, 
+        "context" : context,
         "answer" : answer}
-
-@app.route('/classifyIntent',methods=['POST'])
-# ‘/’ URL is bound with hello_world() function.
-def classifyIntent():
-    '''
-    params :  data <obj> - sentence that needs to be classified
-    Classify a sentence based on the intents 
-    '''
-    data = request.json
-    sent = data.get('sent','')
-    res = {}
-    rank = {}
-    if sent:
-        res = aug_interpreter.parse(sent)
-        rank['Intent'] = [res['intent_ranking'][i]['name'] for i in range(len(res['intent_ranking']))]
-        rank['Confidence'] = [str(np.round(res['intent_ranking'][i]['confidence']*100,2))+' %' for i in range(len(res['intent_ranking']))]
-    return rank
-  
+    
+    
 # main driver function
 if __name__ == '__main__':
   
