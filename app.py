@@ -20,7 +20,27 @@ df = pd.read_excel('data/Delivery_Contexts4.xlsx', sheet_name='Data v3.2', nrows
 
 def classify_context(question, intent):
     if intent == 'Delivery':
-        model_directory = 'models/base_context/'
+        model_directory = 'models/delivery/'
+        interpreter = Interpreter.load(model_directory)
+        context = interpreter.parse(question)
+        return context
+    if intent == 'Subscription':
+        model_directory = 'models/subscription/'
+        interpreter = Interpreter.load(model_directory)
+        context = interpreter.parse(question)
+        return context
+    if intent == 'General':
+        model_directory = 'models/general/'
+        interpreter = Interpreter.load(model_directory)
+        context = interpreter.parse(question)
+        return context
+    if intent == 'Nutrition':
+        model_directory = 'models/nutrition/'
+        interpreter = Interpreter.load(model_directory)
+        context = interpreter.parse(question)
+        return context
+    if intent == 'Support':
+        model_directory = 'models/support/'
         interpreter = Interpreter.load(model_directory)
         context = interpreter.parse(question)
         return context
@@ -42,11 +62,33 @@ def qa_model(intent,context,question):
     if intent == 'Delivery':
         bert_model_directory = 'outputs/delivery/bert/best_model/'
         model = QuestionAnsweringModel('bert', bert_model_directory, use_cuda=False)
-
         to_predict = [{ "context": context, "qas": [{ "question": question, "id": 150 }] }]
         answers, probabilities = model.predict(to_predict)
         return str(answers[0]['answer'][0]),probabilities[0]['probability'][0]
-        #return {}
+    if intent == 'Subscription':
+        bert_model_directory = 'outputs/subscription/'
+        model = QuestionAnsweringModel('bert', bert_model_directory, use_cuda=False)
+        to_predict = [{ "context": context, "qas": [{ "question": question, "id": 150 }] }]
+        answers, probabilities = model.predict(to_predict)
+        return str(answers[0]['answer'][0]),probabilities[0]['probability'][0]
+    if intent == 'General':
+        bert_model_directory = 'outputs/general/'
+        model = QuestionAnsweringModel('bert', bert_model_directory, use_cuda=False)
+        to_predict = [{ "context": context, "qas": [{ "question": question, "id": 150 }] }]
+        answers, probabilities = model.predict(to_predict)
+        return str(answers[0]['answer'][0]),probabilities[0]['probability'][0]
+    if intent == 'Nutrition':
+        bert_model_directory = 'outputs/nutrition_qa_model/best_model/'
+        model = QuestionAnsweringModel('bert', bert_model_directory, use_cuda=False)
+        to_predict = [{ "context": context, "qas": [{ "question": question, "id": 150 }] }]
+        answers, probabilities = model.predict(to_predict)
+        return str(answers[0]['answer'][0]),probabilities[0]['probability'][0]
+    if intent == 'Support':
+        bert_model_directory = 'outputs/support/'
+        model = QuestionAnsweringModel('bert', bert_model_directory, use_cuda=False)
+        to_predict = [{ "context": context, "qas": [{ "question": question, "id": 150 }] }]
+        answers, probabilities = model.predict(to_predict)
+        return str(answers[0]['answer'][0]),probabilities[0]['probability'][0]
     return ""
     
 @app.route('/classifyContext',methods=['POST'])
